@@ -4,11 +4,11 @@ from openunmix import utils
 def separate(
     audio,
     rate=None,
-    model_str_or_path="umxl",
+    model_str_or_path="umx-bass",
     targets=None,
     niter=1,
     residual=False,
-    wiener_win_len=300,
+    wiener_win_len=400,     # 这里把300改成了400
     aggregate_dict=None,
     separator=None,
     device=None,

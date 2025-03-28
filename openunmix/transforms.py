@@ -1,58 +1,57 @@
 from typing import Optional
 
 import torch
-import torchaudio
 from torch import Tensor
 import torch.nn as nn
 
-try:
-    from asteroid_filterbanks.enc_dec import Encoder, Decoder
-    from asteroid_filterbanks.transforms import to_torchaudio, from_torchaudio
-    from asteroid_filterbanks import torch_stft_fb
-except ImportError:
-    pass
+# try:
+#     from asteroid_filterbanks.enc_dec import Encoder, Decoder
+#     from asteroid_filterbanks.transforms import to_torchaudio, from_torchaudio
+#     from asteroid_filterbanks import torch_stft_fb
+# except ImportError:
+#     pass
 
 
 def make_filterbanks(n_fft=4096, n_hop=1024, center=False, sample_rate=44100.0, method="torch"):
     window = nn.Parameter(torch.hann_window(n_fft), requires_grad=False)
 
-    if method == "torch":
-        encoder = TorchSTFT(n_fft=n_fft, n_hop=n_hop, window=window, center=center)
-        decoder = TorchISTFT(n_fft=n_fft, n_hop=n_hop, window=window, center=center)
-    elif method == "asteroid":
-        fb = torch_stft_fb.TorchSTFTFB.from_torch_args(
-            n_fft=n_fft,
-            hop_length=n_hop,
-            win_length=n_fft,
-            window=window,
-            center=center,
-            sample_rate=sample_rate,
-        )
-        encoder = AsteroidSTFT(fb)
-        decoder = AsteroidISTFT(fb)
-    else:
-        raise NotImplementedError
+    # if method == "torch":
+    encoder = TorchSTFT(n_fft=n_fft, n_hop=n_hop, window=window, center=center)
+    decoder = TorchISTFT(n_fft=n_fft, n_hop=n_hop, window=window, center=center)
+    # elif method == "asteroid":
+    #     fb = torch_stft_fb.TorchSTFTFB.from_torch_args(
+    #         n_fft=n_fft,
+    #         hop_length=n_hop,
+    #         win_length=n_fft,
+    #         window=window,
+    #         center=center,
+    #         sample_rate=sample_rate,
+    #     )
+    #     encoder = AsteroidSTFT(fb)
+    #     decoder = AsteroidISTFT(fb)
+    # else:
+    #     raise NotImplementedError
     return encoder, decoder
 
 
-class AsteroidSTFT(nn.Module):
-    def __init__(self, fb):
-        super(AsteroidSTFT, self).__init__()
-        self.enc = Encoder(fb)
-
-    def forward(self, x):
-        aux = self.enc(x)
-        return to_torchaudio(aux)
-
-
-class AsteroidISTFT(nn.Module):
-    def __init__(self, fb):
-        super(AsteroidISTFT, self).__init__()
-        self.dec = Decoder(fb)
-
-    def forward(self, X: Tensor, length: Optional[int] = None) -> Tensor:
-        aux = from_torchaudio(X)
-        return self.dec(aux, length=length)
+# class AsteroidSTFT(nn.Module):
+#     def __init__(self, fb):
+#         super(AsteroidSTFT, self).__init__()
+#         self.enc = Encoder(fb)
+#
+#     def forward(self, x):
+#         aux = self.enc(x)
+#         return to_torchaudio(aux)
+#
+#
+# class AsteroidISTFT(nn.Module):
+#     def __init__(self, fb):
+#         super(AsteroidISTFT, self).__init__()
+#         self.dec = Decoder(fb)
+#
+#     def forward(self, X: Tensor, length: Optional[int] = None) -> Tensor:
+#         aux = from_torchaudio(X)
+#         return self.dec(aux, length=length)
 
 
 class TorchSTFT(nn.Module):
@@ -98,7 +97,7 @@ class TorchSTFT(nn.Module):
         """
 
         shape = x.size()
-        nb_samples, nb_channels, nb_timesteps = shape
+        # nb_samples, nb_channels, nb_timesteps = shape
 
         # pack batch
         x = x.view(-1, shape[-1])
