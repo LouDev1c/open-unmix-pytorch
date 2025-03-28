@@ -205,11 +205,8 @@ class ComplexNorm(nn.Module):
                 `(...,)`
         """
         # take the magnitude
-
         spec = torch.abs(torch.view_as_complex(spec))
-
         # downmix in the mag domain to preserve energy
         if self.mono:
             spec = torch.mean(spec, 1, keepdim=True)
-
         return spec
